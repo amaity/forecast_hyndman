@@ -1,6 +1,5 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-import datetime as dt
 
 import datetime as DT
 import matplotlib.dates as mdates
@@ -8,10 +7,11 @@ import matplotlib.dates as mdates
 from random import gauss
 from random import seed
 from pandas import Series
-from pandas.plotting import autocorrelation_plot
+from pandas.tools.plotting import autocorrelation_plot
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
+import calendar
 
 ##df = pd.read_csv('monthly-beer-production-in-austr.csv',header=None,
 ##                 skiprows=1,skipfooter=2,engine='python',
@@ -39,7 +39,7 @@ def t2dt(atime):
 
 ##melsydPlot----------------------------------
 def melsyd_plot():
-    df3 = pd.read_csv('melsyd.csv')
+    df3 = pd.read_csv('./data/melsyd.csv')
     df3['Date'] = df3['Date'].apply(lambda x:t2dt(x))
     df3['Date'] = df3['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df3.set_index('Date', inplace=True)
@@ -66,7 +66,7 @@ def a10_plot():
 
 ##SeasonPlot----------------------------------
 def season_plot():
-    robjects.r['load']("a10.rda")
+    robjects.r['load']("./data/a10.rda")
     #print(robjects.r['a10'])
     pandas2ri.activate()
     pydf = pd.DataFrame(robjects.r['a10'])
@@ -84,8 +84,10 @@ def season_plot():
                     columns=pydf.index.year,
                     values='drug_sales',
                     aggfunc='sum')
-    pv.plot(style='o-',legend=None)
-    ##.legend(loc='center left',bbox_to_anchor=(1, 0.5))
+    fig,ax = plt.subplots()
+    pv.plot(ax=ax,style='o-',legend=None)
+    conv = lambda x: calendar.month_abbr[x]
+    mths = [conv(x) for x in pv.index.values]
     plot_margin = 1
     x0, x1, y0, y1 = plt.axis()
     plt.axis((x0 - plot_margin,x1 + plot_margin,y0,y1))
@@ -117,8 +119,8 @@ def plot_noise():
     plt.show()
 
 if __name__ == "__main__":
-    melsyd_plot()
+    #melsyd_plot()
     #a10_plot()
-    #season_plot()
+    season_plot()
     #plot_noise()
 
