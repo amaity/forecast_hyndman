@@ -86,8 +86,10 @@ def season_plot():
                     aggfunc='sum')
     fig,ax = plt.subplots()
     pv.plot(ax=ax,style='o-',legend=None)
-    conv = lambda x: calendar.month_abbr[x]
-    mths = [conv(x) for x in pv.index.values]
+    xtks = ax.get_xticks()[1:]
+    ax.set_xticks(xtks)
+    xlabels = [calendar.month_abbr[int(x)] for x in xtks.tolist()]
+    ax.set_xticklabels(xlabels)
     plot_margin = 1
     x0, x1, y0, y1 = plt.axis()
     plt.axis((x0 - plot_margin,x1 + plot_margin,y0,y1))
