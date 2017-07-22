@@ -171,8 +171,7 @@ def plot2_scatter_matrix():
     df = pd.read_csv('./data/fuel.csv')
     labels = ['Litres','City','Highway','Carbon']
     data = df[labels]
-    sm = scatter_matrix(data, alpha=0.4, figsize=(6, 6), diagonal=labels)
-    print(sm.reshape(0))
+    sm = scatter_matrix(data, alpha=0.4, figsize=(6, 6), diagonal=" ")
     [s.xaxis.label.set_visible(False) for s in sm.reshape(-1)]
     [s.yaxis.label.set_visible(False) for s in sm.reshape(-1)]
     for i, label in enumerate(labels):
