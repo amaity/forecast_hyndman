@@ -8,7 +8,6 @@ import matplotlib.dates as mdates
 from random import gauss
 from random import seed
 from pandas import Series
-from pandas.tools.plotting import autocorrelation_plot
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
@@ -109,15 +108,18 @@ def scatter_plot():
 ##PairsPlot----------------------------------
 ##Ref:https://stackoverflow.com/questions/7941207/is-there-a-function-to-make-scatterplot-matrices-in-matplotlib
 import itertools
-import numpy as np
-import matplotlib.pyplot as plt
 
-def main():
-    np.random.seed(1977)
-    numvars, numdata = 4, 10
-    data = 10 * np.random.random((numvars, numdata))
-    fig = scatterplot_matrix(data, ['mpg', 'disp', 'drat', 'wt'],
-            linestyle='none', marker='o', color='black', mfc='none')
+def plot_scatter_matrix():
+##    np.random.seed(1977)
+##    numvars, numdata = 4, 10
+##    data = 10 * np.random.random((numvars, numdata))
+##    fig = scatterplot_matrix(data, ['mpg', 'disp', 'drat', 'wt'],
+##            linestyle='none', marker='o', color='black', mfc='none')
+    df = pd.read_csv('./data/fuel.csv')
+    data = df[['Litres','City','Highway','Carbon']].values.T
+    fig = scatterplot_matrix(data, ['Litres','City','Highway','Carbon'],
+                             linestyle='none', marker='o', markersize=5,
+                             color='black',mfc='none')
     fig.suptitle('Simple Scatterplot Matrix')
     plt.show()
 
@@ -128,14 +130,15 @@ def scatterplot_matrix(data, names, **kwargs):
     passed on to matplotlib's "plot" command. Returns the matplotlib figure
     object containg the subplot grid."""
     numvars, numdata = data.shape
+    print(data)
     fig, axes = plt.subplots(nrows=numvars, ncols=numvars, figsize=(8,8))
     fig.subplots_adjust(hspace=0.05, wspace=0.05)
-
+    
     for ax in axes.flat:
         # Hide all ticks and labels
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
-
+        
         # Set up ticks only on one side for the "edge" subplots...
         if ax.is_first_col():
             ax.yaxis.set_ticks_position('left')
@@ -145,25 +148,37 @@ def scatterplot_matrix(data, names, **kwargs):
             ax.xaxis.set_ticks_position('top')
         if ax.is_last_row():
             ax.xaxis.set_ticks_position('bottom')
-
+        
     # Plot the data.
     for i, j in zip(*np.triu_indices_from(axes, k=1)):
         for x, y in [(i,j), (j,i)]:
             axes[x,y].plot(data[x], data[y], **kwargs)
-
+    
     # Label the diagonal subplots...
     for i, label in enumerate(names):
         axes[i,i].annotate(label, (0.5, 0.5), xycoords='axes fraction',
                 ha='center', va='center')
-
+    
     # Turn on the proper x or y axes ticks.
     for i, j in zip(range(numvars), itertools.cycle((-1, 0))):
         axes[j,i].xaxis.set_visible(True)
         axes[i,j].yaxis.set_visible(True)
 
     return fig
-main()
 
+from pandas.plotting import scatter_matrix
+def plot2_scatter_matrix():
+    df = pd.read_csv('./data/fuel.csv')
+    labels = ['Litres','City','Highway','Carbon']
+    data = df[labels]
+    sm = scatter_matrix(data, alpha=0.4, figsize=(6, 6), diagonal=labels)
+    print(sm.reshape(0))
+    [s.xaxis.label.set_visible(False) for s in sm.reshape(-1)]
+    [s.yaxis.label.set_visible(False) for s in sm.reshape(-1)]
+    for i, label in enumerate(labels):
+        sm[i,i].annotate(label, (0.5, 0.5), xycoords='axes fraction',
+                         ha='center', va='center')
+    plt.show()
 
 ##WhiteNoise---------------------------------
 def plot_noise():
@@ -183,6 +198,7 @@ def plot_noise():
     series.hist(ax=ax[0,1])
     ax[0,1].set_title('Noise Histogram')
     # autocorrelation
+    from pandas.tools.plotting import autocorrelation_plot
     autocorrelation_plot(series,ax=ax[1,0])
     plt.tight_layout()
     plt.show()
@@ -191,6 +207,8 @@ if __name__ == "__main__":
     #melsyd_plot()
     #a10_plot()
     #season_plot()
-    scatter_plot()
+    #scatter_plot()
+    #plot_scatter_matrix()
+    plot2_scatter_matrix()
     #plot_noise()
 
