@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
-import datetime as DT
+import datetime as dt
 import matplotlib.dates as mdates
 
 from random import gauss
@@ -32,10 +32,10 @@ import calendar
 def t2dt(atime):
     year = int(atime)
     remainder = atime - year
-    boy = DT.datetime(year, 1, 1)
-    eoy = DT.datetime(year + 1, 1, 1)
+    boy = dt.datetime(year, 1, 1)
+    eoy = dt.datetime(year + 1, 1, 1)
     seconds = remainder * (eoy - boy).total_seconds()
-    return boy + DT.timedelta(seconds=seconds)
+    return boy + dt.timedelta(seconds=seconds)
 
 ##melsydPlot----------------------------------
 def melsyd_plot():
@@ -179,6 +179,26 @@ def plot2_scatter_matrix():
                          ha='center', va='center')
     plt.show()
 
+##LagPlot------------------------------------
+def lag_plot():
+    df = pd.read_csv('./data/ausbeer.csv',header=None)
+##values = DataFrame(series.values)
+##lags = 7
+##columns = [values]
+##for i in range(1,(lags + 1)):
+##	columns.append(values.shift(i))
+##dataframe = concat(columns, axis=1)
+##columns = ['t+1']
+##for i in range(1,(lags + 1)):
+##	columns.append('t-' + str(i))
+##dataframe.columns = columns
+##pyplot.figure(1)
+##for i in range(1,(lags + 1)):
+##	ax = pyplot.subplot(240 + i)
+##	ax.set_title('t+1 vs t-' + str(i))
+##	pyplot.scatter(x=dataframe['t+1'].values, y=dataframe['t-'+str(i)].values)
+##pyplot.show()
+
 ##WhiteNoise---------------------------------
 def plot_noise():
     # seed random number generator
@@ -197,7 +217,7 @@ def plot_noise():
     series.hist(ax=ax[0,1])
     ax[0,1].set_title('Noise Histogram')
     # autocorrelation
-    from pandas.tools.plotting import autocorrelation_plot
+    from pandas.plotting import autocorrelation_plot
     autocorrelation_plot(series,ax=ax[1,0])
     plt.tight_layout()
     plt.show()
@@ -208,6 +228,7 @@ if __name__ == "__main__":
     #season_plot()
     #scatter_plot()
     #plot_scatter_matrix()
-    plot2_scatter_matrix()
+    #plot2_scatter_matrix()
     #plot_noise()
+    lag_plot()
 
