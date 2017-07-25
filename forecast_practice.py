@@ -12,6 +12,7 @@ from pandas import Series
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 import calendar
+import itertools
 
 ##df = pd.read_csv('monthly-beer-production-in-austr.csv',header=None,
 ##                 skiprows=1,skipfooter=2,engine='python',
@@ -27,8 +28,7 @@ import calendar
 ##ls()
 ##a10
 ##write.zoo(a10,"a10.csv",index.name="Date",sep=",")
-##------------------------------
-
+##TimeUtil------------------------------
 def t2dt(atime):
     """
     Convert atime (a float) to dt.datetime
@@ -126,8 +126,6 @@ def scatter_plot():
 
 ##PairsPlot----------------------------------
 ##Ref:https://stackoverflow.com/questions/7941207/is-there-a-function-to-make-scatterplot-matrices-in-matplotlib
-import itertools
-
 def plot_scatter_matrix():
 ##    np.random.seed(1977)
 ##    numvars, numdata = 4, 10
@@ -199,24 +197,24 @@ def plot2_scatter_matrix():
     plt.show()
 
 ##LagPlot------------------------------------
-import seaborn as sns; sns.set(style="ticks", color_codes=True)
 def lag_plot():
-    df = pd.read_csv('./data/ausbeer.csv',header=None)
-    df[0] = df[0].apply(lambda x:t2dt(x))
-    df[0] = df[0].dt.to_period("Q")
-    df.set_index([0], inplace=True)
+    names = ['qtr','beer']
+    df = pd.read_csv('./data/ausbeer.csv',header=None,names=names)
+    df['qtr'] = df['qtr'].apply(lambda x:t2dt(x))
+    df['qtr'] = df['qtr'].dt.to_period("Q")
+    df.set_index(['qtr'], inplace=True)
     df = df.loc['1992Q1':]
     col_names, lag = [], 9
     for i in range(1,lag+1):
         coln = 'lag'+str(i)
         col_names.append(coln)
-        df[coln] = df[1].shift(i)
+        df[coln] = df['beer'].shift(i)
         pd.concat([df,df[coln]],axis=1)
-    fig, axes = plt.subplots(3, 3, figsize=(6, 6))
+    fig, axes = plt.subplots(3, 3, figsize=(8,8))
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
-    for i in range(3):
-        for j in range(3):
-            df.plot.scatter(x=[1],y='lag1',ax=axes[i,j])
+    lst = [(i,j) for i in range(3) for j in range(3)]
+    for (indx, name) in zip(lst,col_names):
+        df.plot.scatter(x=name,y='beer',ax=axes[indx])
     plt.tight_layout()
     plt.show()
 
@@ -244,6 +242,7 @@ def plot_noise():
     plt.tight_layout()
     plt.show()
 
+##Main--------------------------------------
 if __name__ == "__main__":
     #melsyd_plot()
     #a10_plot()
