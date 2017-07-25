@@ -30,12 +30,31 @@ import calendar
 ##------------------------------
 
 def t2dt(atime):
+    """
+    Convert atime (a float) to dt.datetime
+    This is the inverse of dt2t.
+    assert dt2t(t2dt(atime)) == atime
+    """
     year = int(atime)
     remainder = atime - year
     boy = dt.datetime(year, 1, 1)
     eoy = dt.datetime(year + 1, 1, 1)
     seconds = remainder * (eoy - boy).total_seconds()
     return boy + dt.timedelta(seconds=seconds)
+
+def dt2t(adatetime):
+    """
+    Convert adatetime into a float. The integer part of the float should
+    represent the year.
+    Order should be preserved. If adate<bdate, then d2t(adate)<d2t(bdate)
+    time distances should be preserved: If bdate-adate=ddate-cdate then
+    dt2t(bdate)-dt2t(adate) = dt2t(ddate)-dt2t(cdate)
+    """
+    year = adatetime.year
+    boy = dt.datetime(year, 1, 1)
+    eoy = dt.datetime(year + 1, 1, 1)
+    return year + ((adatetime - boy).total_seconds() / \
+                   ((eoy - boy).total_seconds()))
 
 ##melsydPlot----------------------------------
 def melsyd_plot():
@@ -180,24 +199,27 @@ def plot2_scatter_matrix():
     plt.show()
 
 ##LagPlot------------------------------------
+import seaborn as sns; sns.set(style="ticks", color_codes=True)
 def lag_plot():
     df = pd.read_csv('./data/ausbeer.csv',header=None)
-##values = DataFrame(series.values)
-##lags = 7
-##columns = [values]
-##for i in range(1,(lags + 1)):
-##	columns.append(values.shift(i))
-##dataframe = concat(columns, axis=1)
-##columns = ['t+1']
-##for i in range(1,(lags + 1)):
-##	columns.append('t-' + str(i))
-##dataframe.columns = columns
-##pyplot.figure(1)
-##for i in range(1,(lags + 1)):
-##	ax = pyplot.subplot(240 + i)
-##	ax.set_title('t+1 vs t-' + str(i))
-##	pyplot.scatter(x=dataframe['t+1'].values, y=dataframe['t-'+str(i)].values)
-##pyplot.show()
+    df[0] = df[0].apply(lambda x:t2dt(x))
+    df[0] = df[0].dt.to_period("Q")
+    df.set_index([0], inplace=True)
+    df = df.loc['1992Q1':]
+    col_names, lag = [], 9
+    for i in range(1,lag+1):
+        coln = 'lag'+str(i)
+        col_names.append(coln)
+        df[coln] = df[1].shift(i)
+        pd.concat([df,df[coln]],axis=1)
+    fig, axes = plt.subplots(3, 3, figsize=(6, 6))
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    for i in range(3):
+        for j in range(3):
+            df.plot.scatter(x=[1],y='lag1',ax=axes[i,j])
+    plt.tight_layout()
+    plt.show()
+
 
 ##WhiteNoise---------------------------------
 def plot_noise():
