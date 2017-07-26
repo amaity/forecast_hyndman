@@ -210,14 +210,14 @@ def lag_plot():
         col_names.append(coln)
         df[coln] = df['beer'].shift(i)
         pd.concat([df,df[coln]],axis=1)
-    fig, axes = plt.subplots(3, 3, figsize=(8,8))
+    fig, ax = plt.subplots(3, 3, figsize=(8,8))
     plt.subplots_adjust(wspace=0.5, hspace=0.5)
     lst = [(i,j) for i in range(3) for j in range(3)]
     for (indx, name) in zip(lst,col_names):
-        df.plot.scatter(x=name,y='beer',ax=axes[indx])
+        df.plot.scatter(x=name,y='beer',ax=ax[indx])
+        ax[indx].set_yticklabels([])
     plt.tight_layout()
     plt.show()
-
 
 ##WhiteNoise---------------------------------
 def plot_noise():
@@ -242,6 +242,17 @@ def plot_noise():
     plt.tight_layout()
     plt.show()
 
+##SimpleForecast----------------------------
+def simple_forecast():
+    names = ['qtr','beer']
+    df = pd.read_csv('./data/ausbeer.csv',header=None,names=names)
+    df['qtr'] = df['qtr'].apply(lambda x:t2dt(x))
+    df['qtr'] = df['qtr'].dt.to_period("Q")
+    df.set_index(['qtr'], inplace=True)
+    df = df.loc['1992Q1':]
+    df.plot()
+    plt.show()
+
 ##Main--------------------------------------
 if __name__ == "__main__":
     #melsyd_plot()
@@ -251,5 +262,6 @@ if __name__ == "__main__":
     #plot_scatter_matrix()
     #plot2_scatter_matrix()
     #plot_noise()
-    lag_plot()
+    #lag_plot()
+    simple_forecast()
 
