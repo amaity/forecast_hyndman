@@ -216,6 +216,10 @@ def lag_plot():
     for (indx, name) in zip(lst,col_names):
         df.plot.scatter(x=name,y='beer',ax=ax[indx])
         ax[indx].set_yticklabels([])
+        #ax[indx].plot(ax[indx].get_xlim(), ax[indx].get_ylim(), "r--")
+        ax[indx].plot([0,1],[0,1],'r--',transform=ax[indx].transAxes)
+        ##Using transform=ax.transAxes, the supplied x and y coordinates
+        ##are interpreted as axes coordinates instead of data coordinates.
     plt.tight_layout()
     plt.show()
 
@@ -249,8 +253,9 @@ def simple_forecast():
     df['qtr'] = df['qtr'].apply(lambda x:t2dt(x))
     df['qtr'] = df['qtr'].dt.to_period("Q")
     df.set_index(['qtr'], inplace=True)
-    df = df.loc['1992Q1':]
-    df.plot()
+    df = df.loc['1992':'2006']
+    ax = df.plot()
+    ax.set_xlim(df.index[0],df.index[-1]+11)
     plt.show()
 
 ##Main--------------------------------------
