@@ -115,13 +115,31 @@ def season_plot():
     plt.show()
 
 ##MonthPlot----------------------------------
+import statsmodels.graphics.tsaplots as tsaplots
 def month_plot():
     df = pd.read_csv('./data/a10.csv',header=None,names=['date','drug_sales'])
     dtrng = pd.date_range("1991-07","2008-06",freq='MS')
     df.set_index(dtrng, inplace=True)
     df.drop('date', axis=1, inplace=True)
-    df['year'], df['month'] = df.index.year, df.index.month
-    print(df.head())
+    gp = df.groupby([df.index.month,df.index.year]).sum()
+    tsaplots.seasonal_plot(gp,list(range(1,13)))
+    plt.show()
+        
+def test_seasonal_plot():
+    rs = np.random.RandomState(1234)
+    data = rs.randn(20,12)
+    data += 6*np.sin(np.arange(12.0)/11*np.pi)[None,:]
+    data = data.ravel()
+    months = np.tile(np.arange(1,13),(20,1))
+    months = months.ravel()
+    df = pd.DataFrame([data,months],index=['data','months']).T
+    grouped = df.groupby('months')['data']
+    labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    fig = tsaplots.seasonal_plot(grouped, labels)
+    ax = fig.get_axes()[0]
+    output = [tl.get_text() for tl in ax.get_xticklabels()]
+    #assert_equal(labels, output)
+    plt.show()
 
 ##ScatterPlot--------------------------------
 def scatter_plot():
@@ -270,7 +288,8 @@ if __name__ == "__main__":
     #melsyd_plot()
     #a10_plot()
     #season_plot()
-    month_plot()
+    #month_plot()
+    test_seasonal_plot()
     #scatter_plot()
     #plot_scatter_matrix()
     #plot2_scatter_matrix()
