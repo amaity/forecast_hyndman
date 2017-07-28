@@ -72,7 +72,7 @@ def melsyd_plot():
 
 ##a10Plot-------------------------------------
 def a10_plot():
-    df2 = pd.read_csv('a10.csv',header=None,names=['date','drug_sales'])
+    df2 = pd.read_csv('./data/a10.csv',header=None,names=['date','drug_sales'])
     df2['date'] = df2['date'].apply(lambda x:t2dt(x))
     #df2['date'] = df2t['date'].apply(lambda x: x.strftime('%Y-%m'))
     df2.set_index('date', inplace=True)
@@ -115,6 +115,13 @@ def season_plot():
     plt.show()
 
 ##MonthPlot----------------------------------
+def month_plot():
+    df = pd.read_csv('./data/a10.csv',header=None,names=['date','drug_sales'])
+    dtrng = pd.date_range("1991-07","2008-06",freq='MS')
+    df.set_index(dtrng, inplace=True)
+    df.drop('date', axis=1, inplace=True)
+    df['year'], df['month'] = df.index.year, df.index.month
+    print(df.head())
 
 ##ScatterPlot--------------------------------
 def scatter_plot():
@@ -263,10 +270,11 @@ if __name__ == "__main__":
     #melsyd_plot()
     #a10_plot()
     #season_plot()
+    month_plot()
     #scatter_plot()
     #plot_scatter_matrix()
     #plot2_scatter_matrix()
     #plot_noise()
     #lag_plot()
-    simple_forecast()
+    #simple_forecast()
 
