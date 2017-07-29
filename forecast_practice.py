@@ -116,29 +116,17 @@ def season_plot():
 
 ##MonthPlot----------------------------------
 import statsmodels.graphics.tsaplots as tsaplots
+import statsmodels.api as sm 
 def month_plot():
     df = pd.read_csv('./data/a10.csv',header=None,names=['date','drug_sales'])
     dtrng = pd.date_range("1991-07","2008-06",freq='MS')
     df.set_index(dtrng, inplace=True)
     df.drop('date', axis=1, inplace=True)
-    gp = df.groupby([df.index.month,df.index.year]).sum()
-    tsaplots.seasonal_plot(gp,list(range(1,13)))
-    plt.show()
-        
-def test_seasonal_plot():
-    rs = np.random.RandomState(1234)
-    data = rs.randn(20,12)
-    data += 6*np.sin(np.arange(12.0)/11*np.pi)[None,:]
-    data = data.ravel()
-    months = np.tile(np.arange(1,13),(20,1))
-    months = months.ravel()
-    df = pd.DataFrame([data,months],index=['data','months']).T
-    grouped = df.groupby('months')['data']
-    labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    fig = tsaplots.seasonal_plot(grouped, labels)
-    ax = fig.get_axes()[0]
-    output = [tl.get_text() for tl in ax.get_xticklabels()]
-    #assert_equal(labels, output)
+    fig, ax = plt.subplots()
+    sm.graphics.tsa.month_plot(df,ylabel='$ million',ax=ax)
+    ax.set_title('Seasonal deviation plot: antidiabetic drug sales')
+    #gp = df.groupby([df.index.month,df.index.year]).sum()
+    #tsaplots.seasonal_plot(gp,list(range(1,13)))
     plt.show()
 
 ##ScatterPlot--------------------------------
@@ -288,12 +276,11 @@ if __name__ == "__main__":
     #melsyd_plot()
     #a10_plot()
     #season_plot()
-    #month_plot()
-    test_seasonal_plot()
+    month_plot()
+    #test_seasonal_plot()
     #scatter_plot()
     #plot_scatter_matrix()
     #plot2_scatter_matrix()
     #plot_noise()
     #lag_plot()
     #simple_forecast()
-
